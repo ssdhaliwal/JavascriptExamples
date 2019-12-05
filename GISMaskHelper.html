@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>GIS Mask Helper</title>
+
+    <script type="text/javascript" src="./js/require-2.3.6.min.js"></script>
+</head>
+
+<body class="claro">
+    DD (decimal degrees)<span style="float:right;"><input id="qiIPCOORDDD" class="qiInput" type="text" size="60"></span></br>
+    <code>degrees decimal fraction-of-degree degree-mark</code></br></br>
+
+    DDM (degree minutes)<span style="float:right;"><input id="qiIPCOORDDDM" class="qiInput" type="text" size="60"></span></br>
+    <code>degrees degree-mark separator minutes decimal fraction-of-minute minute-mark</code></br></br>
+
+    DMS (degree minute seconds)<span style="float:right;"><input id="qiIPCOORDDMS" class="qiInput" type="text" size="60"></span></br>
+    <code>degrees degree-mark separator minutes minute-mark separator seconds decimal fraction-of-second second-mark</code></br></br>
+
+    UTM (Universal Transverse Mercator)<span style="float:right;"><input id="qiIPCOORDUTM" class="qiInput" type="text" size="60"></span></br>
+    <code>zone-plus-letter easting northing</code></br></br>
+
+    MGRS (Military Grid Reference Systems)<span style="float:right;"><input id="qiIPCOORDMGRS" class="qiInput" type="text" size="60"></span></br>
+    <code>utm-zone band grid-square-pair easting-northing-pair </code></br></br>
+
+    <script>
+        requirejs.config({
+            baseUrl: 'js',
+            paths: {
+                // the left side is the module ID,
+                // the right side is the path to
+                // the jQuery file, relative to baseUrl.
+                // Also, the path should NOT include
+                // the '.js' file extension. This example
+                // is using jQuery 1.9.0 located at
+                // js/lib/jquery-1.9.0.js, relative to
+                // the HTML page.
+                jquery: 'jquery-1.12.4.min',
+                GISMH: 'GISMaskHelper'
+            }
+        });
+
+        requirejs(['jquery', 'GISMH'], function ($, gismh) {
+            function showError(message) {
+                console.log(message);
+            }
+
+            function getDD() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDDD",
+                    "title": "[+-][0-90].[99999999]°[NSns],[+-][0-180].[99999999]°[EWew]",
+                    "mask": "[-+^]dd{2*90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3*180}.dddddddd'[EWew^]![NSns]*[.]",
+                    "placeholder": "?dd.dddddddd°?,?ddd.dddddddd°?",
+                    "delimiter": ",",
+                    "callback": showError
+                }).initialize();
+            }
+            getDD();
+
+            function getDDM() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDDDM",
+                    "title": "[+-][0-90]° [0-59].[99999999]'[NSns],[+-][0-180]° [0-59].[99999999]'[EWew]",
+                    "mask": "[-+^]dd{2*90}° dd{2*59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3*180}° dd{2*59}.dddddddd'[EWew^]![NSns]*[ -_.]",
+                    "placeholder": "?dd° dd.dddddddd'?,?ddd° dd.dddddddd'?",
+                    "delimiter": ",",
+                    "callback": showError
+                }).initialize();
+            }
+            getDDM();
+
+            function getDMS() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDDMS",
+                    "title": "[+-][0-90]° [0-59]' [0-59].[99999999]\"[NSns],[+-][0-180]° [0-59]' [0-59].[99999999]\"[EWew]",
+                    "mask": "[-+^]dd{2*90}° dd{2*59}' dd{2*59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3*180}° dd{2*59}' dd{2*59}.dddddddd\"[EWew^]![NSns]*[ -_.]",
+                    "placeholder": "?dd° dd' dd.dddddddd\"?,?ddd° dd' dd.dddddddd\"?",
+                    "delimiter": ",",
+                    "callback": showError
+                }).initialize();
+            }
+            getDMS();
+
+            function getUTM() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDUTM",
+                    "title": "dd[NnSs] ddddddE dddddddN",
+                    "mask": "dd{2*1*60}[NnSs] ddddddmE dddddddmN",
+                    "placeholder": "dd_ ddddddmE dddddddmN",
+                    "delimiter": ",",
+                    "callback": showError
+                }).initialize();
+            }
+            getUTM();
+
+            function getMGRS() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDMGRS",
+                    "title": "dd[A..Z!IO] dddddddd",
+                    "mask": "dd{2*1*60}[A..Z!IiOo] \\u\\A dddddddd",
+                    "placeholder": "dd_ __ ddddddddd",
+                    "delimiter": ",",
+                    "callback": showError
+                }).initialize();
+            }
+            getMGRS();
+        });
+    </script>
+</body>
+
+</html>
