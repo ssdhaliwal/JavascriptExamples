@@ -13,7 +13,7 @@ define([], function () {
         return this;
     };
 
-    var GISMaskHelper = function (args) {
+    var GISMaskHelper = function (args, callback) {
         // internal counter/tracking variables
         this.valuesRange = {};
         this.ignoreRange = {};
@@ -30,14 +30,14 @@ define([], function () {
 
         this.area = 0;
         this.delimiter = args.delimiter;
-        this.callback = args.callback;
+        this.callback = callback;
 
         if ((args.delimiter !== null) && (args.delimiter !== undefined)) {
             this.mask = args.mask.split(args.delimiter);
             this.placeholder = args.placeholder.split(args.delimiter);
 
             this.value = [];
-            for (let i = 0; i < this.mask.length; i++) {
+            for (let i = 0, z = this.mask.length; i < z; i++) {
                 this.value.push(this.placeholder[i]);
             }
         } else {
@@ -58,7 +58,7 @@ define([], function () {
         } else {
             //let mask = self.mask.join(self.delimiter).replace(/\[.*?\]/g, "-");
             let placeholder = "", selStart = 0, selEnd = 0;
-            for (let i = 0; i < self.placeholder.length; i++) {
+            for (let i = 0, z = self.placeholder.length; i < z; i++) {
                 selStart = (i === 0 ? i : placeholder.length + self.delimiter.length - 1);
                 placeholder += self.placeholder[i] + self.delimiter;
                 selEnd = placeholder.length - self.delimiter.length;
@@ -109,7 +109,7 @@ define([], function () {
                     }
                 });
                 $.each(valuesRange, function (index, item) {
-                    if ((self.valueOffsetCurrent - 1) === item.offset) {
+                    if ((self.valueOffsetCurrent - 1) == item.offset) {
                         value[item.offset] = placeholder[item.offset];
 
                         keyAdjusted = true;
@@ -124,7 +124,7 @@ define([], function () {
                     for (let i = (self.valueOffsetCurrent - 1); i >= 0; i--) {
                         if (["?", "_", "d"].indexOf(placeholder[i]) !== -1) {
                             $.each(valuesRange, function (index, item) {
-                                if ((item.offset === i) && item.sign) {
+                                if ((item.offset == i) && item.sign) {
                                     signSkip = true;
                                     return false;
                                 }
@@ -141,7 +141,10 @@ define([], function () {
                     }
                 }
 
-                console.log(".. value count BS " + self.valueOffsetCurrent, value.join(""));
+                self.errorMessage = "";
+                if ((self.callback !== null) && (self.callback !== undefined)) {
+                    self.callback(self.errorMessage);
+                }
             } else {
                 let keySignField = false;
                 let valuesRange = {};
@@ -164,18 +167,20 @@ define([], function () {
                     });
                     if (keySignField) {
                         $.each(valuesRange, function (index, item) {
-                            if (item.keys.indexOf(key) !== -1) {
-                            } else if (key === "-") {
-                                if ((item.keys.indexOf("S") !== -1) || (item.keys.indexOf("s") !== -1)) {
-                                    value[item.offset] = "S";
-                                } else if ((item.keys.indexOf("W") !== -1) || (item.keys.indexOf("w") !== -1)) {
-                                    value[item.offset] = "W";
-                                }
-                            } else if (key === "+") {
-                                if ((item.keys.indexOf("N") !== -1) || (item.keys.indexOf("n") !== -1)) {
-                                    value[item.offset] = "N";
-                                } else if ((item.keys.indexOf("E") !== -1) || (item.keys.indexOf("e") !== -1)) {
-                                    value[item.offset] = "E";
+                            if (item.sign) {
+                                if (item.keys.indexOf(key) !== -1) {
+                                } else if (key === "-") {
+                                    if ((item.keys.indexOf("S") !== -1) || (item.keys.indexOf("s") !== -1)) {
+                                        value[item.offset] = "S";
+                                    } else if ((item.keys.indexOf("W") !== -1) || (item.keys.indexOf("w") !== -1)) {
+                                        value[item.offset] = "W";
+                                    }
+                                } else if (key === "+") {
+                                    if ((item.keys.indexOf("N") !== -1) || (item.keys.indexOf("n") !== -1)) {
+                                        value[item.offset] = "N";
+                                    } else if ((item.keys.indexOf("E") !== -1) || (item.keys.indexOf("e") !== -1)) {
+                                        value[item.offset] = "E";
+                                    }
                                 }
                             }
                         });
@@ -184,7 +189,7 @@ define([], function () {
                     let ignoreKeysExit = false;
 
                     $.each(valuesRange, function (index, item) {
-                        if ((self.valueOffsetCurrent === item.offset) && (item.keys.indexOf(key) === -1) &&
+                        if ((self.valueOffsetCurrent == item.offset) && (item.keys.indexOf(key) === -1) &&
                             (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(key) !== -1) &&
                             (!item.sign)) {
                             ignoreKeysExit = true;
@@ -197,13 +202,13 @@ define([], function () {
                                 keyApplied = true;
                             } else {
                                 // if ignoreKeys is specified, then skip those keys
-                                if ((self.valueOffsetCurrent === item.offset) &&
+                                if ((self.valueOffsetCurrent == item.offset) &&
                                     (item.ignoreKeys.length !== 0) && (item.ignoreKeys.indexOf(key) !== -1)) {
                                     ignoreKeysExit = true;
                                     return false;
                                 }
 
-                                if (self.valueOffsetCurrent === item.offset) {
+                                if (self.valueOffsetCurrent == item.offset) {
                                     value[item.offset] = (item.ignoreCase ? key.toUpperCase() : (item.upperCase ? key.toUpperCase() : key));
                                     keyApplied = true;
 
@@ -260,7 +265,7 @@ define([], function () {
                     if (item.keys.indexOf(key) !== -1) {
                         // find delimiter (from key list), scan back for 'd', find a valid value; shift right and fill 0
                         let start = -1, end = -1, count = 0, shiftValue = [];
-                        for (let i = 0; i < value.length; i++) {
+                        for (let i = 0, z = value.length; i < z; i++) {
                             if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(value[i]) !== -1) {
                                 if (start === -1) {
                                     start = i;
@@ -293,7 +298,7 @@ define([], function () {
                     }
                 });
 
-                // validate data entry if maxValueRange is provided
+                // validate data entry if min-maxValueRange is provided
                 let maxValueRange = {}, errorMessage = "";
                 $.each(self.maxValueRange, function (index, item) {
                     if (item.area === self.area) {
@@ -301,26 +306,36 @@ define([], function () {
                     }
                 });
 
-                let storedValue = "", intValue = 0;
+                let storedValue = "", intValue = 0, strValue = "";
                 $.each(maxValueRange, function (index, item) {
-                    storedValue = value.slice(item.offset, item.offset + item.length);
+                    if ((item.valueType === "value") && (self.valueOffsetCurrent == index)) {
+                        storedValue = value.slice(item.offset, item.offset + item.length);
 
-                    if (storedValue.indexOf("d") === -1) {
-                        intValue = parseInt(storedValue.join(""));
-                        if ((intValue < item.minValue) || (intValue > item.maxValue)) {
-                            errorMessage = "invalid value; item " + item.offset + "/ length " + item.length + "/ value " + item.value;
+                        if (storedValue.indexOf("d") === -1) {
+                            intValue = parseInt(storedValue.join(""));
+                            if ((intValue < item.minValue) || (intValue > item.maxValue)) {
+                                errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
+                                return false;
+                            }
+                        }
+                    } else if ((item.valueType === "length") &&
+                        (self.valueOffsetCurrent > item.offset) && (self.valueOffsetCurrent <= index)) {
+                        storedValue = value.slice(item.offset, item.offset + item.length);
+                        strValue = (storedValue.join("")).replace(/d/g, "").length.toString();
+                        if (item.maxLength.indexOf(strValue) === -1) {
+                            errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
                             return false;
                         }
                     }
                 });
 
                 self.errorMessage = errorMessage;
-                if ((self.callback !== null) && (self.callback !== undefined) && (self.errorMessage !== "")) {
+                if ((self.callback !== null) && (self.callback !== undefined)) {
                     self.callback(self.errorMessage);
                 }
 
                 // if next char is same as placeholder for valueOffset; keep incrementing to _ or d
-                for (let i = self.valueOffsetCurrent; i < placeholder.length; i++) {
+                for (let i = self.valueOffsetCurrent, z = placeholder.length; i < z; i++) {
                     if (["_", "d"].indexOf(placeholder[i]) === -1) {
                         self.valueOffsetCurrent++;
                     } else {
@@ -343,7 +358,10 @@ define([], function () {
         self = this;
 
         $.each(value, function (index, item) {
-
+            // get placeholder associated with value
+            // ? = sign - valid [+-NnSsEeWw]; empty = ?
+            // d = numeric [0-9]; empty = d
+            // _ = any valid value; empty = _
         });
     };
 
@@ -361,13 +379,13 @@ define([], function () {
         $(self.element).val(placeholder.join(self.delimiter));
 
         // parse mask to capture multiple chars input index
-        let mask = "", maskCharIndex = {}, index = 0, offset = 0;
-        for (let i = 0; i < self.mask.length; i++) {
+        let mask = "", maskCharIndex = {}, index = 0, offset = 0, value = 0;
+        for (let i = 0, z = self.mask.length; i < z; i++) {
             mask = self.mask[i];
             index += (i === 0) ? 0 : self.delimiter.length;
             offset = 0;
 
-            for (let j = 0; j < mask.length; j++) {
+            for (let j = 0, x = mask.length; j < x; j++) {
                 // range of values....
                 if (mask[j] === "[") {
                     maskCharIndex = {
@@ -380,7 +398,7 @@ define([], function () {
                         ignoreKeys: []
                     };
 
-                    for (let k = j + 1; k < mask.length; k++) {
+                    for (let k = j + 1; k < x; k++) {
                         if (mask[k] === "]") {
                             self.valuesRange[index++] = maskCharIndex;
                             j = k++;
@@ -449,7 +467,7 @@ define([], function () {
                         keys: []
                     };
 
-                    for (let k = j + 2; k < mask.length; k++) {
+                    for (let k = j + 2; k < x; k++) {
                         if (mask[k] === "]") {
                             self.ignoreRange[i] = maskCharIndex;
                             j = k++;
@@ -465,7 +483,7 @@ define([], function () {
                         keys: []
                     };
 
-                    for (let k = j + 2; k < mask.length; k++) {
+                    for (let k = j + 2; k < x; k++) {
                         if (mask[k] === "]") {
                             self.delimiterRange[i] = maskCharIndex;
                             j = k++;
@@ -479,18 +497,35 @@ define([], function () {
                     maskCharIndex = {
                         area: i,
                         offset: offset,
+                        valueType: "value",
                         length: -1,
                         maxValue: null,
-                        minValue: null,
+                        minValue: 0,
                         keys: []
                     };
 
-                    for (let k = j + 1; k < mask.length; k++) {
+                    for (let k = j + 1; k < x; k++) {
                         if (mask[k] === "}") {
-                            maskCharIndex.maxValue = parseInt(maskCharIndex.keys.join(""));
-                            if (maskCharIndex.minValue === null) {
-                                maskCharIndex.minValue = 0;
+                            value = maskCharIndex.keys.join("");
+
+                            // if array then update appropriately
+                            if (maskCharIndex.valueType === "value") {
+                                maskCharIndex.maxValue = parseInt(value);
                             }
+                            // adjust the object for value type
+                            else if (maskCharIndex.valueType === "length") {
+                                if (maskCharIndex.keys.indexOf("|") === -1) {
+                                    maskCharIndex.maxLength = parseInt(value);
+                                    maskCharIndex.minLength = maskCharIndex.minValue;
+                                } else {
+                                    maskCharIndex.maxLength = value.split("|");
+                                }
+
+                                delete maskCharIndex.minValue;
+                                delete maskCharIndex.maxValue;
+                            }
+
+                            // store the value comparision object
                             maskCharIndex.offset -= maskCharIndex.length;
                             delete maskCharIndex.keys;
 
@@ -499,14 +534,22 @@ define([], function () {
 
                             break;
                         } else if (mask[k] === "*") {
+                            value = maskCharIndex.keys.join("");
+
                             if (maskCharIndex.length === -1) {
-                                maskCharIndex.length = parseInt(maskCharIndex.keys.join(""));
+                                maskCharIndex.length = parseInt(value);
                             } else if (maskCharIndex.minValue === null) {
-                                maskCharIndex.minValue = parseInt(maskCharIndex.keys.join(""));
+                                maskCharIndex.minValue = parseInt(value);
                             }
                             maskCharIndex.keys = [];
                         } else {
-                            maskCharIndex.keys.push(mask[k]);
+                            if (mask[k] === "v") {
+                                maskCharIndex.valueType = "value";
+                            } else if (mask[k] === "l") {
+                                maskCharIndex.valueType = "length";
+                            } else {
+                                maskCharIndex.keys.push(mask[k]);
+                            }
                         }
                     }
                 } else {
@@ -519,7 +562,7 @@ define([], function () {
             this.valueOffsetInit = -1;
             placeholder = self.placeholder[self.area];
 
-            for (let i = 0; i < placeholder.length; i++) {
+            for (let i = 0, x = placeholder.length; i < x; i++) {
                 if (placeholder[i] === "d") {
                     this.valueOffsetInit = i;
                     break;
@@ -536,6 +579,7 @@ define([], function () {
                     }
                 }
             }
+
             this.valueOffsetCurrent = this.valueOffsetInit;
         }
 
@@ -556,6 +600,8 @@ define([], function () {
             e.preventDefault();
             e.data.this.processKeyInput(e);
         });
+
+        console.log("initialize/", this);
     };
 
     return GISMaskHelper;
