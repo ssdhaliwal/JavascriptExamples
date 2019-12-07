@@ -1,3 +1,21 @@
+/**
+ * GISMaskHelper.js is designed to allow data collection for input of GIS formats:
+ * 
+ * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
+ * Github:  https://github.com/ssdhaliwal/JavascriptExamples
+ * Version: 1.0b
+ * 
+ * DD   Decimal Degrees
+ * DMS  Degree Minute Seconds
+ * DDM  Degree Decimal Minutes
+ * GARS Global Area Reference System
+ * GeoREF
+ *      World Geographic Reference System
+ * UTM  Universal Transverse Mercator
+ * USNG United States National Grid
+ * MGRS Military Grid Reference System
+ * 
+ */
 define([], function () {
     // static variables
     Array.prototype.addRange = function (start, stop) {
@@ -240,7 +258,8 @@ define([], function () {
                 }
 
                 // if numeric key pressed
-                if (!keyApplied && (self.errorMessage === "")) {
+                if (!keyApplied && 
+                    ((self.errorMessage === "") || (self.errorMessage.startsWith("error length;")))) {
                     if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(key) !== -1) {
                         let index = value.indexOf("d");
 
