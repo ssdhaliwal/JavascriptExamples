@@ -1,6 +1,6 @@
 # JavascriptExamples
 
-## GIS Mask Helper
+## GIS Mask Helper (1.0b)
 
 ### Range Selection
 #### Global Ranges []
