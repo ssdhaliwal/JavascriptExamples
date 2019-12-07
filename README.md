@@ -34,10 +34,12 @@
 ...allow only values 0-9.
 
 #### Validation
-1. dd{2*1*60}
+1. dd{2*1*60}  or  dd{2v*1*60}
 ...check last two decimal values; where min value is 1 and max value is 60; all others are error.
-2. dd{2*90}
+2. dd{2*90}    or  dd{2v*90}
 ...check last two decimal values; where min value is 0 and max value is 90; all others are error.
+3. dddddddd{8l*2|4|6|8}
+...check last 8 chars to be even pairs; odd pairs are error.
 
 #### Examples
 1. Decimal Degrees
