@@ -65,5 +65,5 @@
 5. MGRS
 ```javascript
     (mask) "dd{2*1*60}[A..Z!IiOo] \\u\\A dddddddd"
-    (placeholder) "dd_ __ ddddddddd"
+    (placeholder) "dd_ __ ddddddddd{8l*2|4|6|8}"
 ```
