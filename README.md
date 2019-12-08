@@ -42,44 +42,44 @@
 ...allow only values 0-9.
 
 #### Validation
-1. dd{2*1*60}  or  dd{2v*1*60}
+1. dd{2,1,60}  or  dd{2v,1,60}
 ...check last two decimal values; where min value is 1 and max value is 60; all others are error.
-2. dd{2*90}    or  dd{2v*90}
+2. dd{2,90}    or  dd{2v,90}
 ...check last two decimal values; where min value is 0 and max value is 90; all others are error.
-3. dd{2*25|50|75}    or  dd{2v*25|50|75}
+3. dd{2,25|50|75}    or  dd{2v,25|50|75}
 ...check last two decimal values; where min value is 0 and max value is 25 or 50 or 75 or 100; all others are error.
-4. dd{2*25*25|50|75}    or  dd{2v*25*25|50|75}
+4. dd{2,25,25|50|75}    or  dd{2v,25,25|50|75}
 ...check last two decimal values; where min value is 25 and max value is 25 or 50 or 75 or 100; all others are error.
-5. dddddddd{8l*8}
+5. dddddddd{8l,8}
 ...check last 8 chars; where min length is 0 to 8.
-6. dddddd{8l*4*8}
+6. dddddd{8l,4,8}
 ...check last 8 chars; where min length is 4 to 8.
-7. dddddddd{8l*2|4|6|8}
+7. dddddddd{8l,2|4|6|8}
 ...check last 8 chars to be even length; odd lengths are error.
 
 #### Examples
 1. Decimal Degrees
 ```javascript
-    (mask) "[-+^]dd{2*90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3*180}.dddddddd'[EWew^]![NSns]*[.]"
+    (mask) "[-+^]dd{2,90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3,180}.dddddddd'[EWew^]![NSns]*[.]"
     (placeholder) ?dd.dddddddd°?,?ddd.dddddddd°?
 ```
 2. Degree Minutes
 ```javascript
-    (mask) "[-+^]dd{2*90}° dd{2*59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3*180}° dd{2*59}.dddddddd'[EWew^]![NSns]*[ -_.]"
+    (mask) "[-+^]dd{2,90}° dd{2,59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3,180}° dd{2,59}.dddddddd'[EWew^]![NSns]*[ -_.]"
     (placeholder) "?dd° dd.dddddddd'?,?ddd° dd.dddddddd'?"
 ```
 3. Degree Minute Seconds
 ```javascript
-    (mask) "[-+^]dd{2*90}° dd{2*59}' dd{2*59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3*180}° dd{2*59}' dd{2*59}.dddddddd\"[EWew^]![NSns]*[ -_.]"
+    (mask) "[-+^]dd{2,90}° dd{2,59}' dd{2,59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3,180}° dd{2,59}' dd{2,59}.dddddddd\"[EWew^]![NSns]*[ -_.]"
     (placeholder) "?dd° dd' dd.dddddddd\"?,?ddd° dd' dd.dddddddd\"?"
 ```
 4. UTM
 ```javascript
-    (mask) "dd{2*1*60}[NnSs] ddddddmE dddddddmN"
+    (mask) "dd{2,1,60}[NnSs] ddddddmE dddddddmN"
     (placeholder) "dd_ ddddddmE dddddddmN"
 ```
 5. MGRS
 ```javascript
-    (mask) "dd{2*1*60}[A..Z!IiOo] \\u\\A dddddddd"
-    (placeholder) "dd_ __ ddddddddd{8l*2|4|6|8}"
+    (mask) "dd{2,1,60}[A..Z!IiOo] \\u\\A dddddddd"
+    (placeholder) "dd_ __ ddddddddd{8l,2|4|6|8}"
 ```

@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.3
+ * Version: 1.4
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -630,7 +630,7 @@ define([], function () {
                             j = k++;
 
                             break;
-                        } else if (mask[k] === "*") {
+                        } else if (mask[k] === ",") {
                             value = maskCharIndex.keys.join("");
 
                             if (maskCharIndex.length === -1) {
