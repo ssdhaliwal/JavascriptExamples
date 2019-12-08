@@ -3,17 +3,18 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.1b
+ * Version: 1.3
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
  * DDM  Degree Decimal Minutes
+ * UTM  Universal Transverse Mercator
+ * MGRS Military Grid Reference System
+ * 
  * GARS Global Area Reference System
  * GeoREF
  *      World Geographic Reference System
- * UTM  Universal Transverse Mercator
  * USNG United States National Grid
- * MGRS Military Grid Reference System
  * 
  */
 define([], function () {
@@ -31,7 +32,16 @@ define([], function () {
         return this;
     };
 
-    var GISMaskHelper = function (args, callback) {
+    var GISMaskHelper = function (args, errorCallback, validationCallback) {
+        // static sequences
+        this.latSign = [];
+        this.lonSign = [];
+
+        this.asciiNumbers = "0123456789".split("");
+        this.asciiAlphaLower = "abcdefghijklmnopqrstuvwxyz".split("");
+        this.asciiAlphaUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        this.asciiSpecial = "`~!@#$%^&*()-_=+[]{}\\|;:'\",<.>/?".split("");
+
         // internal counter/tracking variables
         this.valuesRange = {};
         this.ignoreRange = {};
@@ -48,7 +58,8 @@ define([], function () {
 
         this.area = 0;
         this.delimiter = args.delimiter;
-        this.callback = callback;
+        this.errorCallback = errorCallback;
+        this.validationCallback = validationCallback;
 
         if ((args.delimiter !== null) && (args.delimiter !== undefined)) {
             this.mask = args.mask.split(args.delimiter);
@@ -159,10 +170,8 @@ define([], function () {
                     }
                 }
 
-                self.errorMessage = "";
-                if ((self.callback !== null) && (self.callback !== undefined)) {
-                    self.callback(self.errorMessage);
-                }
+                // validate current value
+                this.validate(value);
             } else {
                 let keySignField = false;
                 let valuesRange = {};
@@ -208,7 +217,7 @@ define([], function () {
 
                     $.each(valuesRange, function (index, item) {
                         if ((self.valueOffsetCurrent == item.offset) && (item.keys.indexOf(key) === -1) &&
-                            (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(key) !== -1) &&
+                            (self.asciiNumbers.indexOf(key) !== -1) &&
                             (!item.sign)) {
                             ignoreKeysExit = true;
                             return false;
@@ -260,7 +269,7 @@ define([], function () {
                 // if numeric key pressed
                 if (!keyApplied &&
                     ((self.errorMessage === "") || (self.errorMessage.startsWith("error length;")))) {
-                    if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(key) !== -1) {
+                    if (self.asciiNumbers.indexOf(key) !== -1) {
                         let index = value.indexOf("d");
 
                         if (index !== -1) {
@@ -285,7 +294,7 @@ define([], function () {
                         // find delimiter (from key list), scan back for 'd', find a valid value; shift right and fill 0
                         let start = -1, end = -1, count = 0, shiftValue = [];
                         for (let i = 0, z = value.length; i < z; i++) {
-                            if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(value[i]) !== -1) {
+                            if (self.asciiNumbers.indexOf(value[i]) !== -1) {
                                 if (start === -1) {
                                     start = i;
                                 }
@@ -317,55 +326,8 @@ define([], function () {
                     }
                 });
 
-                // validate data entry if min-maxValueRange is provided
-                let maxValueRange = {}, errorMessage = "";
-                $.each(self.maxValueRange, function (index, item) {
-                    if (item.area === self.area) {
-                        maxValueRange[index] = item;
-                    }
-                });
-
-                let storedValue = "", intValue = 0, strValue = "";
-                $.each(maxValueRange, function (index, item) {
-                    if ((item.valueType === "value") && (self.valueOffsetCurrent == index)) {
-                        storedValue = value.slice(item.offset, item.offset + item.length);
-
-                        if (storedValue.indexOf("d") === -1) {
-                            intValue = parseInt(storedValue.join(""));
-
-                            // if maxvalue is array; then it is comparative match
-                            if (Array.isArray(item.maxValue)) {
-                                if (item.maxValue.indexOf(intValue.toString()) == -1) {
-                                    errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
-                                    return false;
-                                }
-                            } else if ((intValue < item.minValue) || (intValue > item.maxValue)) {
-                                errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
-                                return false;
-                            }
-                        }
-                    } else if ((item.valueType === "length") &&
-                        (self.valueOffsetCurrent > item.offset) && (self.valueOffsetCurrent <= index)) {
-                        storedValue = value.slice(item.offset, item.offset + item.length);
-                        strValue = (storedValue.join("")).replace(/d/g, "").length.toString();
-
-                        // if maxvalue is array; then it is comparative match
-                        if (Array.isArray(item.maxValue)) {
-                            if (item.maxValue.indexOf(strValue) == -1) {
-                                errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
-                                return false;
-                            }
-                        } else if (item.maxLength.indexOf(strValue) === -1) {
-                            errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
-                            return false;
-                        }
-                    }
-                });
-
-                self.errorMessage = errorMessage;
-                if ((self.callback !== null) && (self.callback !== undefined)) {
-                    self.callback(self.errorMessage);
-                }
+                // validate current value
+                this.validate(value);
 
                 // if next char is same as placeholder for valueOffset; keep incrementing to _ or d
                 for (let i = self.valueOffsetCurrent, z = placeholder.length; i < z; i++) {
@@ -385,6 +347,78 @@ define([], function () {
         }
 
         return false;
+    };
+
+    GISMaskHelper.prototype.validate = function(value) {
+        self = this;
+
+        // validate data entry if min-maxValueRange is provided
+        let maxValueRange = {}, errorMessage = "";
+        $.each(self.maxValueRange, function (index, item) {
+            if (item.area === self.area) {
+                maxValueRange[index] = item;
+            }
+        });
+
+        let storedValue = "", intValue = 0, strValue = "";
+        $.each(maxValueRange, function (index, item) {
+            if ((item.valueType === "value") && (self.valueOffsetCurrent == index)) {
+                storedValue = value.slice(item.offset, item.offset + item.length);
+
+                if (storedValue.indexOf("d") === -1) {
+                    intValue = parseInt(storedValue.join(""));
+
+                    // if external validation is defined
+                    if ((item.maxValue === -1) &&
+                        (self.validationCallback !== null) && (self.validationCallback !== undefined)) {
+                        errorMessage = self.validationCallback({
+                            "value": intValue, 
+                            "offset": item.offset, 
+                            "length": item.offset + item.length});
+                    } else {
+                        // if maxvalue is array; then it is comparative match
+                        if (Array.isArray(item.maxValue)) {
+                            if (item.maxValue.indexOf(intValue.toString()) == -1) {
+                                errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
+                                return false;
+                            }
+                        } else if ((intValue < item.minValue) || (intValue > item.maxValue)) {
+                            errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
+                            return false;
+                        }
+                    }
+                }
+            } else if ((item.valueType === "length") &&
+                (self.valueOffsetCurrent > item.offset) && (self.valueOffsetCurrent <= index)) {
+                storedValue = value.slice(item.offset, item.offset + item.length);
+                valueLength = (storedValue.join("")).replace(/d/g, "").length.toString();
+
+                // if external validation is defined
+                if ((item.maxLength === -1) &&
+                    (self.validationCallback !== null) && (self.validationCallback !== undefined)) {
+                    errorMessage = self.validationCallback({
+                        "value": [storedValue.join(""), valueLength], 
+                        "offset": item.offset, 
+                        "length": item.length});
+                } else {
+                    // if maxvalue is array; then it is comparative match
+                    if (Array.isArray(item.maxLength)) {
+                        if (item.maxLength.indexOf(valueLength) == -1) {
+                            errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
+                            return false;
+                        }
+                    } else if (item.maxLength.indexOf(valueLength) === -1) {
+                        errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
+                        return false;
+                    }
+                }
+            }
+        });
+
+        self.errorMessage = errorMessage;
+        if ((self.errorCallback !== null) && (self.errorCallback !== undefined)) {
+            self.errorCallback(self.errorMessage);
+        }
     };
 
     GISMaskHelper.prototype.setValue = function (value) {
@@ -473,22 +507,42 @@ define([], function () {
                     };
 
                     if (mask[j + 1] === "A") {
-                        maskCharIndex.keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+                        maskCharIndex.keys = self.asciiAlphaUpper.slice();
                         self.valuesRange[index++] = maskCharIndex;
                     } else if (mask[j + 1] === "a") {
-                        maskCharIndex.keys = "abcdefghijklmnopqrstuvwxyz".split("");
+                        maskCharIndex.keys = self.asciiAlphaLower.slice();
                         self.valuesRange[index++] = maskCharIndex;
                     } else if (mask[j + 1] === "i") {
-                        maskCharIndex.keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
+                        maskCharIndex.keys = self.asciiAlphaUpper.concat(self.asciiAlphaLower);
                         maskCharIndex.ignoreCase = true;
                         self.valuesRange[index++] = maskCharIndex;
                     } else if (mask[j + 1] === "u") {
-                        maskCharIndex.keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
+                        maskCharIndex.keys = self.asciiAlphaUpper.concat(self.asciiAlphaLower);
                         maskCharIndex.ignoreCase = true;
                         maskCharIndex.convertUpper = true;
                         self.valuesRange[index++] = maskCharIndex;
+                    } else if (mask[j + 1] === "z") {
+                        maskCharIndex.keys = self.asciiAlphaUpper.concat(self.asciiAlphaLower).concat(self.asciiNumbers);
+                        maskCharIndex.ignoreCase = true;
+                        maskCharIndex.convertUpper = false;
+                        self.valuesRange[index++] = maskCharIndex;
+                    } else if (mask[j + 1] === "Z") {
+                        maskCharIndex.keys = self.asciiAlphaUpper.concat(self.asciiAlphaLower).concat(self.asciiNumbers);
+                        maskCharIndex.ignoreCase = true;
+                        maskCharIndex.convertUpper = true;
+                        self.valuesRange[index++] = maskCharIndex;
+                    } else if (mask[j + 1] === "*") {
+                        maskCharIndex.keys = self.asciiAlphaUpper.concat(self.asciiAlphaLower).concat(self.asciiNumbers).concat(self.asciiSpecial);
+                        maskCharIndex.ignoreCase = true;
+                        maskCharIndex.convertUpper = false;
+                        self.valuesRange[index++] = maskCharIndex;
+                    } else if ((mask[j + 1] === "n") || (mask[j + 1] === "N")) {
+                        maskCharIndex.keys = self.asciiNumbers.slice();
+                        maskCharIndex.ignoreCase = true;
+                        maskCharIndex.convertUpper = false;
+                        self.valuesRange[index++] = maskCharIndex;
                     } else if (mask[j + 1] === "!") {
-                        maskCharIndex.keys = "`~!@#$%^&*()-_=+[]{}\\|;:'\",<.>/?".split("");
+                        maskCharIndex.keys = self.asciiSpecial.slice();
                         self.valuesRange[index++] = maskCharIndex;
                     }
 
@@ -540,6 +594,12 @@ define([], function () {
                     for (let k = j + 1; k < x; k++) {
                         if (mask[k] === "}") {
                             value = maskCharIndex.keys.join("");
+                            
+                            // when external validation will be called, min/max are provided
+                            if (maskCharIndex.length === -1) {
+                                maskCharIndex.length = parseInt(value);
+                                value = -1;
+                            }
 
                             // if array then update appropriately
                             if (maskCharIndex.valueType === "value") {

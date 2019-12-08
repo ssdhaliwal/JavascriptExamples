@@ -44,6 +44,10 @@
             style="float: right;"><input id="qiIPCOORDMGRS" class="qiInput" type="text" size="60"></span></br>
         <code>utm-zone band grid-square-pair easting-northing-pair</code></br></br></span></br></br>
 
+    <span style="background-color: rgb(172, 214, 176);display: block;"></br>USNG (United States National Grid)<span
+        style="float: right;"><input id="qiIPCOORDUSNG" class="qiInput" type="text" size="60"></span></br>
+    <code>utm-zone band grid-square-pair easting-northing-pair (datum)</code></br></br></span></br></br>
+
     <span style="background-color: rgb(176, 172, 214);display: block;"></br>Phone #<span
             style="float: right;">State:<select id="qiSTATELIST">
             </select><input id="qiIPCOORDPHONE" class="qiInput" type="text" size="60"></span></br>
@@ -130,6 +134,12 @@
                 $("#qiIPCOORDERROR").text(message);
             }
 
+            function validateInput(validate) {
+                console.log(validate);
+
+                return "";
+            }
+
             function getDD() {
                 let mh = new gismh({
                     "element": "#qiIPCOORDDD",
@@ -186,14 +196,27 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDMGRS",
                     "title": "dd[A..Z!IO] dddddddd",
-                    "mask": "dd{2v*1*60}[A..Za..z!IiOo] \\u\\A dddddddd{8l*2|4|6|8}",
+                    "mask": "dd{2v*1*60}[A..Za..z!IiOo] \\u\\u dddddddd{8l*2|4|6|8}",
                     "placeholder": "dd_ __ dddddddd",
                     "delimiter": ","
                 },
-                    showError
+                    showError, validateInput
                 ).initialize();
             }
             getMGRS();
+
+            function getUSNG() {
+                let mh = new gismh({
+                    "element": "#qiIPCOORDUSNG",
+                    "title": "dd[A..Z!IO] dddddddd (datum)",
+                    "mask": "dd{2v*1*60}[A..Za..z!IiOo] \\u\\u dddddddd{8l*2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)",
+                    "placeholder": "dd_ __ dddddddd (________)",
+                    "delimiter": ","
+                },
+                    showError, validateInput
+                ).initialize();
+            }
+            getUSNG();
 
             function setPHONEAreaCodes() {
                 $("#qiSTATELIST option:selected").each(function () {

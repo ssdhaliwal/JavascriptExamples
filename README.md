@@ -23,11 +23,19 @@
 3. \\u
 ...allow alpha chars (case in-sensitive); convert the chars to uppercase.
 4. \\i
-...allow alpha chars; lower case entry only.
+...allow alpha chars; any case.
 5. \\!
 ...allow all special chars.
-6. \\A
+6. \\a
+...allow only lowercase chars.
+7. \\A
 ...allow only uppercase chars.
+8. \\z
+...allow alpha-numeric case in-sensitive chars.
+9. \\Z
+...allow alpha-numeric change to uppercase.
+10. \\*
+...allow any ascii printable char.
 
 #### Special Chars
 1. d
