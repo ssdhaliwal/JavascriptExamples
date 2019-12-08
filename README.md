@@ -18,7 +18,7 @@
 #### Char Ranges
 1. [NnSs]
 ...only allow N or n or S or s; not a sign field.  Will not allow further entry until char is entered correctly.
-2. [A..Z!IO]
+2. [A..Z!IO]   or [A..Za..z!IOio]
 ...allow all upper case chars A-Z except I and O.
 3. \\u
 ...allow alpha chars (case in-sensitive); convert the chars to uppercase.
@@ -38,8 +38,16 @@
 ...check last two decimal values; where min value is 1 and max value is 60; all others are error.
 2. dd{2*90}    or  dd{2v*90}
 ...check last two decimal values; where min value is 0 and max value is 90; all others are error.
-3. dddddddd{8l*2|4|6|8}
-...check last 8 chars to be even pairs; odd pairs are error.
+3. dd{2*25|50|75}    or  dd{2v*25|50|75}
+...check last two decimal values; where min value is 0 and max value is 25 or 50 or 75 or 100; all others are error.
+4. dd{2*25*25|50|75}    or  dd{2v*25*25|50|75}
+...check last two decimal values; where min value is 25 and max value is 25 or 50 or 75 or 100; all others are error.
+5. dddddddd{8l*8}
+...check last 8 chars; where min length is 0 to 8.
+6. dddddd{8l*4*8}
+...check last 8 chars; where min length is 4 to 8.
+7. dddddddd{8l*2|4|6|8}
+...check last 8 chars to be even length; odd lengths are error.
 
 #### Examples
 1. Decimal Degrees

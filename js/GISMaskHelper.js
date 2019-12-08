@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.0b
+ * Version: 1.1b
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -258,7 +258,7 @@ define([], function () {
                 }
 
                 // if numeric key pressed
-                if (!keyApplied && 
+                if (!keyApplied &&
                     ((self.errorMessage === "") || (self.errorMessage.startsWith("error length;")))) {
                     if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].indexOf(key) !== -1) {
                         let index = value.indexOf("d");
@@ -332,7 +332,14 @@ define([], function () {
 
                         if (storedValue.indexOf("d") === -1) {
                             intValue = parseInt(storedValue.join(""));
-                            if ((intValue < item.minValue) || (intValue > item.maxValue)) {
+
+                            // if maxvalue is array; then it is comparative match
+                            if (Array.isArray(item.maxValue)) {
+                                if (item.maxValue.indexOf(intValue.toString()) == -1) {
+                                    errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
+                                    return false;
+                                }
+                            } else if ((intValue < item.minValue) || (intValue > item.maxValue)) {
                                 errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
                                 return false;
                             }
@@ -341,7 +348,14 @@ define([], function () {
                         (self.valueOffsetCurrent > item.offset) && (self.valueOffsetCurrent <= index)) {
                         storedValue = value.slice(item.offset, item.offset + item.length);
                         strValue = (storedValue.join("")).replace(/d/g, "").length.toString();
-                        if (item.maxLength.indexOf(strValue) === -1) {
+
+                        // if maxvalue is array; then it is comparative match
+                        if (Array.isArray(item.maxValue)) {
+                            if (item.maxValue.indexOf(strValue) == -1) {
+                                errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
+                                return false;
+                            }
+                        } else if (item.maxLength.indexOf(strValue) === -1) {
                             errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
                             return false;
                         }
@@ -529,7 +543,11 @@ define([], function () {
 
                             // if array then update appropriately
                             if (maskCharIndex.valueType === "value") {
-                                maskCharIndex.maxValue = parseInt(value);
+                                if (maskCharIndex.keys.indexOf("|") === -1) {
+                                    maskCharIndex.maxValue = parseInt(value);
+                                } else {
+                                    maskCharIndex.maxValue = value.split("|");
+                                }
                             }
                             // adjust the object for value type
                             else if (maskCharIndex.valueType === "length") {

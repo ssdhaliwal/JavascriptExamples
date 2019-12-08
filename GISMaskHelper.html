@@ -20,23 +20,34 @@
 </head>
 
 <body class="claro">
-    <span style="background-color: silver;display: block;">Error<span style="color: blue;float: right;"><label id="qiIPCOORDERROR"></label></span></span></br>
+    <span style="background-color: silver;display: block;">Error<span style="color: blue;float: right;"><label
+                id="qiIPCOORDERROR"></label></span></span></br>
     </br></br>
 
-    <span style="background-color: rgb(214, 191, 172);display: block;"></br>DD (decimal degrees)<span style="float: right;"><input id="qiIPCOORDDD" class="qiInput" type="text" size="60"></span></br>
-    <code>degrees decimal fraction-of-degree degree-mark</code></br></br></span></br></br>
+    <span style="background-color: rgb(214, 191, 172);display: block;"></br>DD (decimal degrees)<span
+            style="float: right;"><input id="qiIPCOORDDD" class="qiInput" type="text" size="60"></span></br>
+        <code>degrees decimal fraction-of-degree degree-mark</code></br></br></span></br></br>
 
-    <span style="background-color: rgb(172, 192, 214);display: block;"></br>DDM (degree decimal minutes)<span style="float: right;"><input id="qiIPCOORDDDM" class="qiInput" type="text" size="60"></span></br>
-    <code>degrees minites degree-mark separator minutes decimal fraction-of-minute minute-mark</code></br></br></span></br></br>
+    <span style="background-color: rgb(172, 192, 214);display: block;"></br>DDM (degree decimal minutes)<span
+            style="float: right;"><input id="qiIPCOORDDDM" class="qiInput" type="text" size="60"></span></br>
+        <code>degrees minites degree-mark separator minutes decimal fraction-of-minute minute-mark</code></br></br></span></br></br>
 
-    <span style="background-color: rgb(214, 182, 172);display: block;"></br>DMS (degree minute seconds)<span style="float: right;"><input id="qiIPCOORDDMS" class="qiInput" type="text" size="60"></span></br>
-    <code>degrees degree-mark separator minutes minute-mark separator seconds decimal fraction-of-second second-mark</code></br></br></span></br></br>
+    <span style="background-color: rgb(214, 182, 172);display: block;"></br>DMS (degree minute seconds)<span
+            style="float: right;"><input id="qiIPCOORDDMS" class="qiInput" type="text" size="60"></span></br>
+        <code>degrees degree-mark separator minutes minute-mark separator seconds decimal fraction-of-second second-mark</code></br></br></span></br></br>
 
-    <span style="background-color: rgb(207, 172, 214);display: block;"></br>UTM (Universal Transverse Mercator)<span style="float: right;"><input id="qiIPCOORDUTM" class="qiInput" type="text" size="60"></span></br>
-    <code>zone-plus-letter easting northing</code></br></br></span></br></br>
+    <span style="background-color: rgb(207, 172, 214);display: block;"></br>UTM (Universal Transverse Mercator)<span
+            style="float: right;"><input id="qiIPCOORDUTM" class="qiInput" type="text" size="60"></span></br>
+        <code>zone-plus-letter easting northing</code></br></br></span></br></br>
 
-    <span style="background-color: rgb(172, 214, 176);display: block;"></br>MGRS (Military Grid Reference Systems)<span style="float: right;"><input id="qiIPCOORDMGRS" class="qiInput" type="text" size="60"></span></br>
-    <code>utm-zone band grid-square-pair easting-northing-pair </code></br></br></span></br></br>
+    <span style="background-color: rgb(172, 214, 176);display: block;"></br>MGRS (Military Grid Reference Systems)<span
+            style="float: right;"><input id="qiIPCOORDMGRS" class="qiInput" type="text" size="60"></span></br>
+        <code>utm-zone band grid-square-pair easting-northing-pair</code></br></br></span></br></br>
+
+    <span style="background-color: rgb(176, 172, 214);display: block;"></br>Phone #<span
+            style="float: right;">State:<select id="qiSTATELIST">
+            </select><input id="qiIPCOORDPHONE" class="qiInput" type="text" size="60"></span></br>
+        <code>area-code number</code></br><code><span id="qiIPCOORDPHONELIST"></span></code></br></span></br></br>
 
     <script>
         requirejs.config({
@@ -56,6 +67,65 @@
         });
 
         requirejs(['jquery', 'GISMH'], function ($, gismh) {
+            var stateAreaCodeList = {
+                "Alabama": { "areaCodes": ["205", "251", "256", "334", "938"] },
+                "Alaska": { "areaCodes": ["907"] },
+                "Arizona": { "areaCodes": ["480", "520", "602", "623", "928"] },
+                "Arkansas": { "areaCodes": ["479", "501", "870"] },
+                "California": { "areaCodes": ["209", "213", "279", "310", "323", "408", "415", "424", "442", "510", "530", "559", "562", "619", "626", "628", "650", "657", "661", "669", "707", "714", "747", "760", "805", "818", "820", "831", "858", "909", "916", "925", "949", "951"] },
+                "Colorado": { "areaCodes": ["303", "719", "720", "970"] },
+                "Connecticut": { "areaCodes": ["203", "475", "860", "959"] },
+                "Delaware": { "areaCodes": ["302"] },
+                "Florida": { "areaCodes": ["239", "305", "321", "352", "386", "407", "561", "727", "754", "772", "786", "813", "850", "863", "904", "941", "954"] },
+                "Georgia": { "areaCodes": ["229", "404", "470", "478", "678", "706", "762", "770", "912"] },
+                "Hawaii": { "areaCodes": ["808"] },
+                "Idaho": { "areaCodes": ["208", "986"] },
+                "Illinois": { "areaCodes": ["217", "224", "309", "312", "331", "618", "630", "708", "773", "779", "815", "847", "872"] },
+                "Indiana": { "areaCodes": ["219", "260", "317", "463", "574", "765", "812", "930"] },
+                "Iowa": { "areaCodes": ["319", "515", "563", "641", "712"] },
+                "Kansas": { "areaCodes": ["316", "620", "785", "913"] },
+                "Kentucky": { "areaCodes": ["270", "364", "502", "606", "859"] },
+                "Louisiana": { "areaCodes": ["225", "318", "337", "504", "985"] },
+                "Maine": { "areaCodes": ["207"] },
+                "Maryland": { "areaCodes": ["240", "301", "410", "443", "667"] },
+                "Massachusetts": { "areaCodes": ["339", "351", "413", "508", "617", "774", "781", "857", "978"] },
+                "Michigan": { "areaCodes": ["231", "248", "269", "313", "517", "586", "616", "734", "810", "906", "947", "989"] },
+                "Minnesota": { "areaCodes": ["218", "320", "507", "612", "651", "763", "952"] },
+                "Mississippi": { "areaCodes": ["228", "601", "662", "769"] },
+                "Missouri": { "areaCodes": ["314", "417", "573", "636", "660", "816"] },
+                "Montana": { "areaCodes": ["406"] },
+                "Nebraska": { "areaCodes": ["308", "402", "531"] },
+                "Nevada": { "areaCodes": ["702", "725", "775"] },
+                "New Hampshire": { "areaCodes": ["603"] },
+                "New Jersey": { "areaCodes": ["201", "551", "609", "640", "732", "848", "856", "862", "908", "973"] },
+                "New Mexico": { "areaCodes": ["505", "575"] },
+                "New York": { "areaCodes": ["212", "315", "332", "347", "516", "518", "585", "607", "631", "646", "680", "716", "718", "838", "845", "914", "917", "929", "934"] },
+                "North Carolina": { "areaCodes": ["252", "336", "704", "743", "828", "910", "919", "980", "984"] },
+                "North Dakota": { "areaCodes": ["701"] },
+                "Ohio": { "areaCodes": ["216", "220", "234", "330", "380", "419", "440", "513", "567", "614", "740", "937"] },
+                "Oklahoma": { "areaCodes": ["405", "539", "580", "918"] },
+                "Oregon": { "areaCodes": ["458", "503", "541", "971"] },
+                "Pennsylvania": { "areaCodes": ["215", "223", "267", "272", "412", "445", "484", "570", "610", "717", "724", "814", "878"] },
+                "Rhode Island": { "areaCodes": ["401"] },
+                "South Carolina": { "areaCodes": ["803", "843", "854", "864"] },
+                "South Dakota": { "areaCodes": ["605"] },
+                "Tennessee": { "areaCodes": ["423", "615", "629", "731", "865", "901", "931"] },
+                "Texas": { "areaCodes": ["210", "214", "254", "281", "325", "346", "361", "409", "430", "432", "469", "512", "682", "713", "726", "737", "806", "817", "830", "832", "903", "915", "936", "940", "956", "972", "979"] },
+                "Utah": { "areaCodes": ["385", "435", "801"] },
+                "Vermont": { "areaCodes": ["802"] },
+                "Virginia": { "areaCodes": ["276", "434", "540", "571", "703", "757", "804"] },
+                "Washington": { "areaCodes": ["206", "253", "360", "425", "509", "564"] },
+                "Washington DC": { "areaCodes": ["202"] },
+                "West Virginia": { "areaCodes": ["304", "681"] },
+                "Wisconsin": { "areaCodes": ["262", "414", "534", "608", "715", "920"] },
+                "Wyoming": { "areaCodes": ["307"] },
+                "American Samoa": { "areaCodes": ["684"] },
+                "Guam": { "areaCodes": ["671"] },
+                "Northern Mariana Islands": { "areaCodes": ["670"] },
+                "Puerto Rico": { "areaCodes": ["787", "939"] },
+                "Virgin Islands": { "areaCodes": ["340"] }
+            };
+
             function showError(message) {
                 $("#qiIPCOORDERROR").text(message);
             }
@@ -66,7 +136,8 @@
                     "title": "[+-][0-90].[99999999]°[NSns],[+-][0-180].[99999999]°[EWew]",
                     "mask": "[-+^]dd{2v*90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3v*180}.dddddddd'[EWew^]![NSns]*[.]",
                     "placeholder": "?dd.dddddddd°?,?ddd.dddddddd°?",
-                    "delimiter": ","},
+                    "delimiter": ","
+                },
                     showError
                 ).initialize();
             }
@@ -78,7 +149,8 @@
                     "title": "[+-][0-90]° [0-59].[99999999]'[NSns],[+-][0-180]° [0-59].[99999999]'[EWew]",
                     "mask": "[-+^]dd{2v*90}° dd{2v*59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3v*180}° dd{2v*59}.dddddddd'[EWew^]![NSns]*[ -_.]",
                     "placeholder": "?dd° dd.dddddddd'?,?ddd° dd.dddddddd'?",
-                    "delimiter": ","},
+                    "delimiter": ","
+                },
                     showError
                 ).initialize();
             }
@@ -90,7 +162,8 @@
                     "title": "[+-][0-90]° [0-59]' [0-59].[99999999]\"[NSns],[+-][0-180]° [0-59]' [0-59].[99999999]\"[EWew]",
                     "mask": "[-+^]dd{2v*90}° dd{2v*59}' dd{2v*59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3v*180}° dd{2v*59}' dd{2v*59}.dddddddd\"[EWew^]![NSns]*[ -_.]",
                     "placeholder": "?dd° dd' dd.dddddddd\"?,?ddd° dd' dd.dddddddd\"?",
-                    "delimiter": ","},
+                    "delimiter": ","
+                },
                     showError
                 ).initialize();
             }
@@ -102,7 +175,8 @@
                     "title": "dd[NnSs] ddddddE dddddddN",
                     "mask": "dd{2v*1*60}[NnSs] ddddddmE dddddddmN",
                     "placeholder": "dd_ ddddddmE dddddddmN",
-                    "delimiter": ","},
+                    "delimiter": ","
+                },
                     showError
                 ).initialize();
             }
@@ -114,11 +188,52 @@
                     "title": "dd[A..Z!IO] dddddddd",
                     "mask": "dd{2v*1*60}[A..Za..z!IiOo] \\u\\A dddddddd{8l*2|4|6|8}",
                     "placeholder": "dd_ __ dddddddd",
-                    "delimiter": ","},
+                    "delimiter": ","
+                },
                     showError
                 ).initialize();
             }
             getMGRS();
+
+            function setPHONEAreaCodes() {
+                $("#qiSTATELIST option:selected").each(function () {
+                    let state = $(this).text();
+                    let areaCodes = stateAreaCodeList[state].areaCodes;
+
+                    // unbind old events
+                    $("#qiIPCOORDPHONE").unbind();
+                    $("#qiIPCOORDPHONELIST").html(state + "/" + areaCodes);
+
+                    let mh = new gismh({
+                        "element": "#qiIPCOORDPHONE",
+                        "title": "(ddd) ddd-dddd xdddddd",
+                        "mask": "(ddd{3v*" + areaCodes.join("|") + "}) ddd-dddd xdddddd{6l*4|5|6}*[ -_.]",
+                        "placeholder": "(ddd) ddd-dddd xdddddd",
+                        "delimiter": ","
+                    },
+                        showError
+                    ).initialize();
+                });
+            }
+            function getPHONE() {
+                let optionText, optionValue;
+                $.each(stateAreaCodeList, function (index, item) {
+                    optionText = index;
+                    optionValue = item.areaCodes;
+
+                    $("#qiSTATELIST").append(new Option(optionText, optionValue));
+                });
+
+                // initial setup for current item
+                setPHONEAreaCodes();
+
+                // set event on select
+                $("#qiSTATELIST").on("change", function (e) {
+                    setPHONEAreaCodes();
+                    console.log(state + ": " + areaCodes);
+                });
+            }
+            getPHONE();
         });
     </script>
 </body>
