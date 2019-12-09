@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.4
+ * Version: 1.5
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -57,25 +57,14 @@ define([], function () {
         this.title = args.title;
 
         this.area = 0;
-        this.delimiter = args.delimiter;
+        this.delimiter = ",";
         this.errorCallback = errorCallback;
         this.validationCallback = validationCallback;
 
-        if ((args.delimiter !== null) && (args.delimiter !== undefined)) {
-            this.mask = args.mask.split(args.delimiter);
-            this.placeholder = args.placeholder.split(args.delimiter);
+        this.mask = args.mask;
+        this.placeholder = args.placeholder;
 
-            this.value = [];
-            for (let i = 0, z = this.mask.length; i < z; i++) {
-                this.value.push(this.placeholder[i]);
-            }
-        } else {
-            this.area = 0;
-            this.mask = [args.mask];
-            this.placeholder = [args.placeholder];
-
-            this.value = [this.placeholder];
-        }
+        this.value = this.placeholder.slice();
     };
 
     GISMaskHelper.prototype.selectInputArea = function (e) {

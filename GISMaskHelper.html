@@ -144,9 +144,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDDD",
                     "title": "[+-][0-90].[99999999]°[NSns],[+-][0-180].[99999999]°[EWew]",
-                    "mask": "[-+^]dd{2v,90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3v,180}.dddddddd'[EWew^]![NSns]*[.]",
-                    "placeholder": "?dd.dddddddd°?,?ddd.dddddddd°?",
-                    "delimiter": ","
+                    "mask": ["[-+^]dd{2v,90}.dddddddd'[NnSs^]![EWew]*[.]","[-+^]ddd{3v,180}.dddddddd'[EWew^]![NSns]*[.]"],
+                    "placeholder": ["?dd.dddddddd°?","?ddd.dddddddd°?"]
                 },
                     showError
                 ).initialize();
@@ -157,9 +156,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDDDM",
                     "title": "[+-][0-90]° [0-59].[99999999]'[NSns],[+-][0-180]° [0-59].[99999999]'[EWew]",
-                    "mask": "[-+^]dd{2v,90}° dd{2v,59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3v,180}° dd{2v,59}.dddddddd'[EWew^]![NSns]*[ -_.]",
-                    "placeholder": "?dd° dd.dddddddd'?,?ddd° dd.dddddddd'?",
-                    "delimiter": ","
+                    "mask": ["[-+^]dd{2v,90}° dd{2v,59}.dddddddd'[NnSs^]![EWew]*[ -_.]","[-+^]ddd{3v,180}° dd{2v,59}.dddddddd'[EWew^]![NSns]*[ -_.]"],
+                    "placeholder": ["?dd° dd.dddddddd'?","?ddd° dd.dddddddd'?"]
                 },
                     showError
                 ).initialize();
@@ -170,9 +168,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDDMS",
                     "title": "[+-][0-90]° [0-59]' [0-59].[99999999]\"[NSns],[+-][0-180]° [0-59]' [0-59].[99999999]\"[EWew]",
-                    "mask": "[-+^]dd{2v,90}° dd{2v,59}' dd{2v,59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3v,180}° dd{2v,59}' dd{2v,59}.dddddddd\"[EWew^]![NSns]*[ -_.]",
-                    "placeholder": "?dd° dd' dd.dddddddd\"?,?ddd° dd' dd.dddddddd\"?",
-                    "delimiter": ","
+                    "mask": ["[-+^]dd{2v,90}° dd{2v,59}' dd{2v,59}.dddddddd\"[NnSs^]![EWew]*[ -_.]","[-+^]ddd{3v,180}° dd{2v,59}' dd{2v,59}.dddddddd\"[EWew^]![NSns]*[ -_.]"],
+                    "placeholder": ["?dd° dd' dd.dddddddd\"?","?ddd° dd' dd.dddddddd\"?"]
                 },
                     showError
                 ).initialize();
@@ -183,9 +180,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDUTM",
                     "title": "dd[NnSs] ddddddE dddddddN",
-                    "mask": "dd{2v,1,60}[NnSs] ddddddmE dddddddmN",
-                    "placeholder": "dd_ ddddddmE dddddddmN",
-                    "delimiter": ","
+                    "mask": ["dd{2v,1,60}[NnSs] ddddddmE dddddddmN"],
+                    "placeholder": ["dd_ ddddddmE dddddddmN"]
                 },
                     showError
                 ).initialize();
@@ -196,9 +192,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDMGRS",
                     "title": "dd[A..Z!IO] dddddddd",
-                    "mask": "dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8}",
-                    "placeholder": "dd_ __ dddddddd",
-                    "delimiter": ","
+                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8}"],
+                    "placeholder": ["dd_ __ dddddddd"]
                 },
                     showError, validateInput
                 ).initialize();
@@ -209,9 +204,8 @@
                 let mh = new gismh({
                     "element": "#qiIPCOORDUSNG",
                     "title": "dd[A..Z!IO] dddddddd (datum)",
-                    "mask": "dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)",
-                    "placeholder": "dd_ __ dddddddd (________)",
-                    "delimiter": ","
+                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"],
+                    "placeholder": ["dd_ __ dddddddd (________)"]
                 },
                     showError, validateInput
                 ).initialize();
@@ -230,9 +224,8 @@
                     let mh = new gismh({
                         "element": "#qiIPCOORDPHONE",
                         "title": "(ddd) ddd-dddd xdddddd",
-                        "mask": "(ddd{3v," + areaCodes.join("|") + "}) ddd-dddd xdddddd{6l,4|5|6}*[ -_.]",
-                        "placeholder": "(ddd) ddd-dddd xdddddd",
-                        "delimiter": ","
+                        "mask": ["(ddd{3v," + areaCodes.join("|") + "}) ddd-dddd xdddddd{6l,4|5|6}*[ -_.]"],
+                        "placeholder": ["(ddd) ddd-dddd xdddddd"]
                     },
                         showError
                     ).initialize();

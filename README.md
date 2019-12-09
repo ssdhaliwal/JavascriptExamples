@@ -60,26 +60,36 @@
 #### Examples
 1. Decimal Degrees
 ```javascript
-    (mask) "[-+^]dd{2,90}.dddddddd'[NnSs^]![EWew]*[.],[-+^]ddd{3,180}.dddddddd'[EWew^]![NSns]*[.]"
-    (placeholder) ?dd.dddddddd°?,?ddd.dddddddd°?
+    (mask) ["[-+^]dd{2,90}.dddddddd'[NnSs^]![EWew]*[.]","[-+^]ddd{3,180}.dddddddd'[EWew^]![NSns]*[.]"]
+    (placeholder) ["?dd.dddddddd°?","?ddd.dddddddd°?"]
 ```
 2. Degree Minutes
 ```javascript
-    (mask) "[-+^]dd{2,90}° dd{2,59}.dddddddd'[NnSs^]![EWew]*[ -_.],[-+^]ddd{3,180}° dd{2,59}.dddddddd'[EWew^]![NSns]*[ -_.]"
-    (placeholder) "?dd° dd.dddddddd'?,?ddd° dd.dddddddd'?"
+    (mask) ["[-+^]dd{2,90}° dd{2,59}.dddddddd'[NnSs^]![EWew]*[ -_.]","[-+^]ddd{3,180}° dd{2,59}.dddddddd'[EWew^]![NSns]*[ -_.]"]
+    (placeholder) ["?dd° dd.dddddddd'?","?ddd° dd.dddddddd'?"]
 ```
 3. Degree Minute Seconds
 ```javascript
-    (mask) "[-+^]dd{2,90}° dd{2,59}' dd{2,59}.dddddddd\"[NnSs^]![EWew]*[ -_.],[-+^]ddd{3,180}° dd{2,59}' dd{2,59}.dddddddd\"[EWew^]![NSns]*[ -_.]"
-    (placeholder) "?dd° dd' dd.dddddddd\"?,?ddd° dd' dd.dddddddd\"?"
+    (mask) ["[-+^]dd{2,90}° dd{2,59}' dd{2,59}.dddddddd\"[NnSs^]![EWew]*[ -_.]","[-+^]ddd{3,180}° dd{2,59}' dd{2,59}.dddddddd\"[EWew^]![NSns]*[ -_.]"]
+    (placeholder) ["?dd° dd' dd.dddddddd\"?","?ddd° dd' dd.dddddddd\"?"]
 ```
 4. UTM
 ```javascript
-    (mask) "dd{2,1,60}[NnSs] ddddddmE dddddddmN"
-    (placeholder) "dd_ ddddddmE dddddddmN"
+    (mask) ["dd{2,1,60}[NnSs] ddddddmE dddddddmN"]
+    (placeholder) ["dd_ ddddddmE dddddddmN"]
 ```
 5. MGRS
 ```javascript
-    (mask) "dd{2,1,60}[A..Z!IiOo] \\u\\A dddddddd"
-    (placeholder) "dd_ __ ddddddddd{8l,2|4|6|8}"
+    (mask) ["dd{2,1,60}[A..Z!IiOo] \\u\\A dddddddd"]
+    (placeholder) ["dd_ __ ddddddddd{8l,2|4|6|8}"]
+```
+6. USNG
+```javascript
+    (mask) ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"]
+    (placeholder) ["dd_ __ dddddddd (________)"]
+```
+7. PHONE
+```javascript
+    (mask) ["(ddd{3v," + areaCodes.join("|") + "}) ddd-dddd xdddddd{6l,4|5|6}*[ -_.]"]
+    (placeholder) ["(ddd) ddd-dddd xdddddd"]
 ```
