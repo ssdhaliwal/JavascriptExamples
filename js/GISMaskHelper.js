@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.5
+ * Version: 1.6
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -49,9 +49,8 @@ define([], function () {
         this.maxValueRange = {};
         this.selStart = 0;
         this.selEnd = 0;
-        this.errorMessage = "";
-        this.valueOffsetInit = -1;
-        this.valueOffsetCurrent = -1;
+        this.errorMessage = [];
+        this.valueOffset = {};
 
         this.element = args.element;
         this.title = args.title;
@@ -64,7 +63,7 @@ define([], function () {
         this.mask = args.mask;
         this.placeholder = args.placeholder;
 
-        this.value = this.placeholder.slice();
+        this.value = args.placeholder.slice();
     };
 
     GISMaskHelper.prototype.selectInputArea = function (e) {
@@ -93,6 +92,11 @@ define([], function () {
                 }
             }
         }
+
+        // if there is an error message active, resend it
+        if ((self.errorCallback !== null) && (self.errorCallback !== undefined)) {
+            self.errorCallback(self.errorMessage[self.area]);
+        }
     };
 
     GISMaskHelper.prototype.processKeyInput = function (e) {
@@ -102,36 +106,36 @@ define([], function () {
         if (e.key === "Enter") {
             let val = $(self.element).val().trim();
         } else {
-            let value = self.value[self.area].split("");
-            let placeholder = self.placeholder[self.area];
+            let area = self.area, value = self.value[area].split("");
+            let placeholder = self.placeholder[area];
             let key = e.key, keyApplied = false;
 
             // check if ignore key is defined
-            if ((self.ignoreRange[self.area] !== null) && (self.ignoreRange[self.area] !== undefined)) {
-                if (self.ignoreRange[self.area].keys.indexOf(key) !== -1) {
+            if ((self.ignoreRange[area] !== null) && (self.ignoreRange[area] !== undefined)) {
+                if (self.ignoreRange[area].keys.indexOf(key) !== -1) {
                     return false;
                 }
             }
 
             // if backspace; delete data from end of value
             if ((key === "Backspace") || (key === "Delete")) {
-                self.errorMessage = "";
+                self.errorMessage[area] = "";
 
                 let valuesRange = {};
                 let keyUpdated = false, keyAdjusted = false;;
 
                 // reset back and validate offset for custom chars
                 $.each(self.valuesRange, function (index, item) {
-                    if (item.area === self.area) {
+                    if (item.area === area) {
                         valuesRange[index] = item;
                     }
                 });
                 $.each(valuesRange, function (index, item) {
-                    if ((self.valueOffsetCurrent - 1) == item.offset) {
+                    if ((self.valueOffset[area].current - 1) == item.offset) {
                         value[item.offset] = placeholder[item.offset];
 
                         keyAdjusted = true;
-                        self.valueOffsetCurrent--;
+                        self.valueOffset[area].current--;
                         return false;
                     }
                 });
@@ -139,7 +143,7 @@ define([], function () {
                 // reset to marker for any values
                 if (!keyUpdated && !keyAdjusted) {
                     let signSkip = false;
-                    for (let i = (self.valueOffsetCurrent - 1); i >= 0; i--) {
+                    for (let i = (self.valueOffset[area].current - 1); i >= 0; i--) {
                         if (["?", "_", "d"].indexOf(placeholder[i]) !== -1) {
                             $.each(valuesRange, function (index, item) {
                                 if ((item.offset == i) && item.sign) {
@@ -153,21 +157,21 @@ define([], function () {
                             }
 
                             value[i] = placeholder[i];
-                            self.valueOffsetCurrent = i;
+                            self.valueOffset[area].current = i;
                             break;
                         }
                     }
                 }
 
                 // validate current value
-                this.validate(value);
+                self.validate(value);
             } else {
                 let keySignField = false;
                 let valuesRange = {};
 
                 // if key press is in multiple values
                 $.each(self.valuesRange, function (index, item) {
-                    if (item.area === self.area) {
+                    if (item.area === area) {
                         valuesRange[index] = item;
                     }
                 });
@@ -205,7 +209,7 @@ define([], function () {
                     let ignoreKeysExit = false;
 
                     $.each(valuesRange, function (index, item) {
-                        if ((self.valueOffsetCurrent == item.offset) && (item.keys.indexOf(key) === -1) &&
+                        if ((self.valueOffset[area].current == item.offset) && (item.keys.indexOf(key) === -1) &&
                             (self.asciiNumbers.indexOf(key) !== -1) &&
                             (!item.sign)) {
                             ignoreKeysExit = true;
@@ -218,17 +222,19 @@ define([], function () {
                                 keyApplied = true;
                             } else {
                                 // if ignoreKeys is specified, then skip those keys
-                                if ((self.valueOffsetCurrent == item.offset) &&
+                                if ((self.valueOffset[area].current == item.offset) &&
                                     (item.ignoreKeys.length !== 0) && (item.ignoreKeys.indexOf(key) !== -1)) {
                                     ignoreKeysExit = true;
                                     return false;
                                 }
 
-                                if (self.valueOffsetCurrent == item.offset) {
-                                    value[item.offset] = (item.ignoreCase ? key.toUpperCase() : (item.upperCase ? key.toUpperCase() : key));
-                                    keyApplied = true;
+                                if (self.valueOffset[area].current == item.offset) {
+                                    if ((self.errorMessage[area] === "") || (self.errorMessage[area].startsWith("error length;"))) {
+                                        value[item.offset] = (item.ignoreCase ? key.toUpperCase() : (item.upperCase ? key.toUpperCase() : key));
+                                        keyApplied = true;
 
-                                    self.valueOffsetCurrent++
+                                        self.valueOffset[area].current++
+                                    }
                                     return false;
                                 }
                             }
@@ -257,13 +263,13 @@ define([], function () {
 
                 // if numeric key pressed
                 if (!keyApplied &&
-                    ((self.errorMessage === "") || (self.errorMessage.startsWith("error length;")))) {
+                    ((self.errorMessage[area] === "") || (self.errorMessage[area].startsWith("error length;")))) {
                     if (self.asciiNumbers.indexOf(key) !== -1) {
                         let index = value.indexOf("d");
 
                         if (index !== -1) {
                             value[index] = key;
-                            self.valueOffsetCurrent++;
+                            self.valueOffset[area].current++;
                             keyApplied = true;
                         }
                     }
@@ -273,7 +279,7 @@ define([], function () {
                 // if delimiter pressed; left fill digits to the next delimiter position with 0 (right justify)
                 let delimiterRange = {};
                 $.each(self.delimiterRange, function (index, item) {
-                    if (item.area === self.area) {
+                    if (item.area === area) {
                         delimiterRange[index] = item;
                     }
                 });
@@ -302,7 +308,7 @@ define([], function () {
                                     for (let offset = 0, j = start; j <= end; j++) {
                                         if (j <= count) {
                                             value[j] = "0";
-                                            self.valueOffsetCurrent++;
+                                            self.valueOffset[area].current++;
                                         } else {
                                             value[j] = shiftValue[offset++];
                                         }
@@ -316,19 +322,21 @@ define([], function () {
                 });
 
                 // validate current value
-                this.validate(value);
+                self.validate(value);
 
                 // if next char is same as placeholder for valueOffset; keep incrementing to _ or d
-                for (let i = self.valueOffsetCurrent, z = placeholder.length; i < z; i++) {
-                    if (["_", "d"].indexOf(placeholder[i]) === -1) {
-                        self.valueOffsetCurrent++;
-                    } else {
-                        break;
+                if (self.errorMessage[area] === "") {
+                    for (let i = self.valueOffset[area].current, z = placeholder.length; i < z; i++) {
+                        if (["_", "d"].indexOf(placeholder[i]) === -1) {
+                            self.valueOffset[area].current++;
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
 
-            self.value[self.area] = value.join("");
+            self.value[area] = value.join("");
 
             $(self.element).val(self.value.join(self.delimiter));
             e.currentTarget.selectionStart = self.selStart;
@@ -342,16 +350,17 @@ define([], function () {
         self = this;
 
         // validate data entry if min-maxValueRange is provided
-        let maxValueRange = {}, errorMessage = "";
+        let area = self.area, maxValueRange = {}, errorMessage = "";
+        console.log("validate/", value, self.valueOffset[area].current, self);
         $.each(self.maxValueRange, function (index, item) {
-            if (item.area === self.area) {
+            if (item.area === area) {
                 maxValueRange[index] = item;
             }
         });
 
         let storedValue = "", intValue = 0, strValue = "";
         $.each(maxValueRange, function (index, item) {
-            if ((item.valueType === "value") && (self.valueOffsetCurrent == index)) {
+            if ((item.valueType === "value") && (self.valueOffset[area].current == (item.offset + item.length))) {
                 storedValue = value.slice(item.offset, item.offset + item.length);
 
                 if (storedValue.indexOf("d") === -1) {
@@ -378,7 +387,7 @@ define([], function () {
                     }
                 }
             } else if ((item.valueType === "length") &&
-                (self.valueOffsetCurrent > item.offset) && (self.valueOffsetCurrent <= index)) {
+                (self.valueOffset[area].current > item.offset) && (self.valueOffset[area].current <= index)) {
                 storedValue = value.slice(item.offset, item.offset + item.length);
                 valueLength = (storedValue.join("")).replace(/d/g, "").length.toString();
 
@@ -404,9 +413,9 @@ define([], function () {
             }
         });
 
-        self.errorMessage = errorMessage;
+        self.errorMessage[area] = errorMessage;
         if ((self.errorCallback !== null) && (self.errorCallback !== undefined)) {
-            self.errorCallback(self.errorMessage);
+            self.errorCallback(self.errorMessage[area]);
         }
     };
 
@@ -431,8 +440,8 @@ define([], function () {
         self = this;
 
         // set the element placeholder
-        let placeholder = self.placeholder;
-        $(self.element).val(placeholder.join(self.delimiter));
+        let area = self.area, placeholder = self.placeholder[area];
+        $(self.element).val(self.placeholder.join(self.delimiter));
 
         // parse mask to capture multiple chars input index
         let mask = "", maskCharIndex = {}, index = 0, offset = 0, value = 0;
@@ -645,28 +654,32 @@ define([], function () {
             }
 
             // set the start value offset
-            this.valueOffsetInit = -1;
-            placeholder = self.placeholder[self.area];
+            let placeholder = "";
+            for (let a = 0, l = self.placeholder.length; a < l; a++) {
+                placeholder = self.placeholder[a];
+                self.valueOffset[a] = {};
+                self.errorMessage[a] = "";
 
-            for (let i = 0, x = placeholder.length; i < x; i++) {
-                if (placeholder[i] === "d") {
-                    this.valueOffsetInit = i;
-                    break;
-                } else if (placeholder[i] === "_") {
-                    $.each(self.valuesRange, function (index, item) {
-                        if ((item.offset === i) && !item.sign) {
-                            this.valueOffsetInit = i;
-                            return false;
-                        }
-                    });
-
-                    if (this.valueOffsetInit !== -1) {
+                for (let i = 0, x = placeholder.length; i < x; i++) {
+                    if (placeholder[i] === "d") {
+                        self.valueOffset[a].init = i;
+                        self.valueOffset[a].current = i;
                         break;
+                    } else if (placeholder[i] === "_") {
+                        $.each(self.valuesRange, function (index, item) {
+                            if ((item.offset === i) && !item.sign) {
+                                self.valueOffset[a].init = i;
+                                self.valueOffset[a].current = i;
+                                return false;
+                            }
+                        });
+
+                        if (self.valueOffset[a].init !== -1) {
+                            break;
+                        }
                     }
                 }
             }
-
-            this.valueOffsetCurrent = this.valueOffsetInit;
         }
 
         // prevent keys to be showin in the input area
@@ -687,7 +700,7 @@ define([], function () {
             e.data.this.processKeyInput(e);
         });
 
-        console.log("initialize/", this);
+        console.log("initialize/", self);
     };
 
     return GISMaskHelper;
