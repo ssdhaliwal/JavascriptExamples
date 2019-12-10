@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Encrypt/Decrypt Example</title>
+
+    <script src="js/aes-3.1.2.min.js"></script>
+    <script src="js/jquery-1.12.4.min.js"></script>
+
+    <style>
+        .qiInput {
+            background: transparent;
+            border-style: solid;
+            border-width: thin;
+            border-color: blanchedalmond;
+        }
+    </style>
+</head>
+
+<body class="claro">
+    <h1>Encrypt/Decrypt with passphrase (AES)</h1>
+    <br><br>
+    <span style="background-color: rgb(172, 214, 188);display: block;"></br>Data to encrypt:
+        <span style="float: right;"><input id="qiData" class="qiInput" type="text" size="100"></span></br></br></span>
+    <span style="background-color: rgb(214, 213, 172);display: block;"></br>Pass-phrase:
+        <span style="float: right;"><input id="qiPassPhrase" class="qiInput" type="text"
+                size="60"></span></br></br></span>
+    </br></br>
+    <a href="#"><label id="qiClickValidate">Click here to validate</label></a>
+
+    <br><br>
+    <label>Encrypted</label>
+    <div id="demo1"></div>
+    <br>
+
+    <label>Decrypted</label>
+    <div id="demo2"></div>
+
+    <br>
+    <label>Actual Message</label>
+    <div id="demo3"></div>
+    <script>
+        $("#qiClickValidate").on("click", function () {
+            let encrypted = CryptoJS.AES.encrypt($("#qiData").val(), $("#qiPassPhrase").val());
+            //U2FsdGVkX18ZUVvShFSES21qHsQEqZXMxQ9zgHy+bu0=
+
+            let decrypted = CryptoJS.AES.decrypt(encrypted, $("#qiPassPhrase").val());
+            //4d657373616765
+
+            document.getElementById("demo1").innerHTML = encrypted;
+            document.getElementById("demo2").innerHTML = decrypted;
+            document.getElementById("demo3").innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
+        });
+    </script>
+</body>
+
+</html>
