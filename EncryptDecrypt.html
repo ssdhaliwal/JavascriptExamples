@@ -29,8 +29,11 @@
         <span style="float: right;"><input id="qiPassPhrase" class="qiInput" type="text"
                 size="60"></span></br></br></span>
     </br></br>
-    <a href="#"><label id="qiClickValidate">Click here to validate</label></a>
+    <a href="#"><label id="qiClickEncrypt">Click here to encrypt</label></a>
+    <br><br>
+    <a href="#"><label id="qiClickDecrypt">Click here to decrypt</label></a>
 
+    <br><br>
     <br><br>
     <label>Encrypted</label>
     <div id="demo1"></div>
@@ -43,15 +46,20 @@
     <label>Actual Message</label>
     <div id="demo3"></div>
     <script>
-        $("#qiClickValidate").on("click", function () {
+        $("#qiClickEncrypt").on("click", function () {
             let encrypted = CryptoJS.AES.encrypt($("#qiData").val(), $("#qiPassPhrase").val());
-            //U2FsdGVkX18ZUVvShFSES21qHsQEqZXMxQ9zgHy+bu0=
 
             let decrypted = CryptoJS.AES.decrypt(encrypted, $("#qiPassPhrase").val());
-            //4d657373616765
 
             document.getElementById("demo1").innerHTML = encrypted;
             document.getElementById("demo2").innerHTML = decrypted;
+            document.getElementById("demo3").innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
+        });
+        $("#qiClickDecrypt").on("click", function () {
+            let decrypted = CryptoJS.AES.decrypt($("#qiData").val(), $("#qiPassPhrase").val());
+
+            document.getElementById("demo1").innerHTML = "";
+            document.getElementById("demo2").innerHTML = "";
             document.getElementById("demo3").innerHTML = decrypted.toString(CryptoJS.enc.Utf8);
         });
     </script>
