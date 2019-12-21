@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.6
+ * Version: 1.7
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -15,6 +15,10 @@
  * GeoREF
  *      World Geographic Reference System
  * USNG United States National Grid
+ * 
+ * Test Formats added for extending to other type masks
+ * PHONE
+ * ADDRESS
  * 
  */
 define([], function () {
@@ -346,12 +350,11 @@ define([], function () {
         return false;
     };
 
-    GISMaskHelper.prototype.validate = function(value) {
+    GISMaskHelper.prototype.validate = function (value) {
         self = this;
 
         // validate data entry if min-maxValueRange is provided
         let area = self.area, maxValueRange = {}, errorMessage = "";
-        console.log("validate/", value, self.valueOffset[area].current, self);
         $.each(self.maxValueRange, function (index, item) {
             if (item.area === area) {
                 maxValueRange[index] = item;
@@ -370,9 +373,10 @@ define([], function () {
                     if ((item.maxValue === -1) &&
                         (self.validationCallback !== null) && (self.validationCallback !== undefined)) {
                         errorMessage = self.validationCallback({
-                            "value": intValue, 
-                            "offset": item.offset, 
-                            "length": item.offset + item.length});
+                            "value": intValue,
+                            "offset": item.offset,
+                            "length": item.offset + item.length
+                        });
                     } else {
                         // if maxvalue is array; then it is comparative match
                         if (Array.isArray(item.maxValue)) {
@@ -383,6 +387,15 @@ define([], function () {
                         } else if ((intValue < item.minValue) || (intValue > item.maxValue)) {
                             errorMessage = "error value; offset " + item.offset + "/ length " + item.length;
                             return false;
+                        }
+
+                        // call external validation if defined
+                        if ((self.validationCallback !== null) && (self.validationCallback !== undefined)) {
+                            errorMessage = self.validationCallback({
+                                "value": intValue,
+                                "offset": item.offset,
+                                "length": item.offset + item.length
+                            });
                         }
                     }
                 }
@@ -395,9 +408,10 @@ define([], function () {
                 if ((item.maxLength === -1) &&
                     (self.validationCallback !== null) && (self.validationCallback !== undefined)) {
                     errorMessage = self.validationCallback({
-                        "value": [storedValue.join(""), valueLength], 
-                        "offset": item.offset, 
-                        "length": item.length});
+                        "value": [storedValue.join(""), valueLength],
+                        "offset": item.offset,
+                        "length": item.length
+                    });
                 } else {
                     // if maxvalue is array; then it is comparative match
                     if (Array.isArray(item.maxLength)) {
@@ -408,6 +422,15 @@ define([], function () {
                     } else if (item.maxLength.indexOf(valueLength) === -1) {
                         errorMessage = "error length; offset " + item.offset + "/ length " + item.length;
                         return false;
+                    }
+
+                    // call external validation if defined
+                    if ((self.validationCallback !== null) && (self.validationCallback !== undefined)) {
+                        errorMessage = self.validationCallback({
+                            "value": intValue,
+                            "offset": item.offset,
+                            "length": item.offset + item.length
+                        });
                     }
                 }
             }
@@ -427,13 +450,46 @@ define([], function () {
             // ? = sign - valid [+-NnSsEeWw]; empty = ?
             // d = numeric [0-9]; empty = d
             // _ = any valid value; empty = _
+            let itemArray = item.split(""), event, sign = false;
+            for (let i = 0, z = itemArray.length; i < z; i++) {
+                event = {
+                    key: itemArray[i],
+                    currentTarget: $(self.element),
+                    data: {
+                        this: self
+                    }
+                }
+
+                if (["-","+"].indexOf(event.key) !== -1) {
+                    sign = true;
+                }
+
+                self.processKeyInput(event);
+            }
+
+            if (!sign) {
+                event = {
+                    key: "+",
+                    currentTarget: $(self.element),
+                    data: {
+                        this: self
+                    }
+                }
+
+                self.processKeyInput(event);
+            }
         });
     };
 
     GISMaskHelper.prototype.getValue = function () {
         self = this;
 
-        return self.value;
+        let value = self.value;
+        $.each(value, function(index, item) {
+            item = item.replace("d", "").replace("_", "");
+        });
+
+        return value;
     };
 
     GISMaskHelper.prototype.initialize = function () {
@@ -592,7 +648,7 @@ define([], function () {
                     for (let k = j + 1; k < x; k++) {
                         if (mask[k] === "}") {
                             value = maskCharIndex.keys.join("");
-                            
+
                             // when external validation will be called, min/max are provided
                             if (maskCharIndex.length === -1) {
                                 maskCharIndex.length = parseInt(value);
@@ -700,7 +756,7 @@ define([], function () {
             e.data.this.processKeyInput(e);
         });
 
-        console.log("initialize/", self);
+        return self;
     };
 
     return GISMaskHelper;
