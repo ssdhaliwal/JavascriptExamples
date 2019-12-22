@@ -1,6 +1,6 @@
 # JavascriptExamples
 
-## GIS Mask Helper (1.7)
+## GIS Mask Helper (1.8)
 
 ### Range Selection
 #### Global Ranges []
@@ -75,18 +75,18 @@
 ```
 4. UTM
 ```javascript
-    (mask) ["dd{2,1,60}[NnSs] ddddddmE dddddddmN"]
-    (placeholder) ["dd_ ddddddmE dddddddmN"]
+    (mask) ["dd{2,1,60}[NnSs] dddddddmN ddddddmE"]
+    (placeholder) ["dd_ dddddddmN ddddddmE"]
 ```
 5. MGRS
 ```javascript
-    (mask) ["dd{2,1,60}[A..Z!IiOo] \\u\\A dddddddd"]
-    (placeholder) ["dd_ __ ddddddddd{8l,2|4|6|8}"]
+    (mask) ["dd{2,1,60}[A..Z!IiOo] \\u\\A dddddddd dddddddd"]
+    (placeholder) ["dd_ __ ddddddddd{8l,2|4|6|8} ddddddddd{8l,2|4|6|8}"]
 ```
 6. USNG
 ```javascript
-    (mask) ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"]
-    (placeholder) ["dd_ __ dddddddd (________)"]
+    (mask) ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"]
+    (placeholder) ["dd_ __ dddddddd dddddddd (________)"]
 ```
 7. PHONE
 ```javascript

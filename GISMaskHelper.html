@@ -179,9 +179,9 @@
             function getUTM() {
                 let mh = new gismh({
                     "element": "#qiIPCOORDUTM",
-                    "title": "dd[NnSs] ddddddE dddddddN",
-                    "mask": ["dd{2v,1,60}[NnSs] ddddddmE dddddddmN"],
-                    "placeholder": ["dd_ ddddddmE dddddddmN"]
+                    "title": "dd[NnSs] dddddddN  ddddddE",
+                    "mask": ["dd{2v,1,60}[NnSs] dddddddmN ddddddmE"],
+                    "placeholder": ["dd_ dddddddmN ddddddmE"]
                 },
                     showError
                 ).initialize();
@@ -191,9 +191,9 @@
             function getMGRS() {
                 let mh = new gismh({
                     "element": "#qiIPCOORDMGRS",
-                    "title": "dd[A..Z!IO] dddddddd",
-                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8}"],
-                    "placeholder": ["dd_ __ dddddddd"]
+                    "title": "dd[A..Z!IO] dddddddd dddddddd",
+                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} dddddddd{8l,2|4|6|8}"],
+                    "placeholder": ["dd_ __ dddddddd dddddddd"]
                 },
                     showError, validateInput
                 ).initialize();
@@ -203,9 +203,9 @@
             function getUSNG() {
                 let mh = new gismh({
                     "element": "#qiIPCOORDUSNG",
-                    "title": "dd[A..Z!IO] dddddddd (datum)",
-                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"],
-                    "placeholder": ["dd_ __ dddddddd (________)"]
+                    "title": "dd[A..Z!IO] dddddddd dddddddd (datum)",
+                    "mask": ["dd{2v,1,60}[A..Za..z!IiOo] \\u\\u dddddddd{8l,2|4|6|8} dddddddd{8l,2|4|6|8} (\\Z\\Z\\Z\\Z\\Z\\Z\\Z\\Z)"],
+                    "placeholder": ["dd_ __ dddddddd dddddddd (________)"]
                 },
                     showError, validateInput
                 ).initialize();

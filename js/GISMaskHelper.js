@@ -3,7 +3,7 @@
  * 
  * Author:  Seraj Dhaliwal/seraj.dhaliwal@live.com
  * Github:  https://github.com/ssdhaliwal/JavascriptExamples
- * Version: 1.7
+ * Version: 1.8
  * 
  * DD   Decimal Degrees
  * DMS  Degree Minute Seconds
@@ -486,7 +486,7 @@ define([], function () {
 
         let value = self.value;
         $.each(value, function(index, item) {
-            item = item.replace("d", "").replace("_", "");
+            item = item.replace(/d/g, "").replace(/_/g, "").replace(/\?/g, "");
         });
 
         return value;
